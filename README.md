@@ -1,0 +1,1 @@
+# solochain-template
