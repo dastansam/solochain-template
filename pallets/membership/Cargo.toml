@@ -1,6 +1,6 @@
 [package]
-name = "pallet-template"
-description = "FRAME pallet template for defining custom runtime logic."
+name = "pallet-membership"
+description = "Membership pallet"
 version = "0.0.0"
 license = "Unlicense"
 authors.workspace = true
@@ -24,11 +24,13 @@ scale-info = { features = [
 frame-benchmarking = { optional = true, workspace = true }
 frame-support = { workspace = true }
 frame-system = { workspace = true }
+sp-core = { workspace = true, default-features = true }
+sp-runtime = { workspace = true, default-features = true }
 
 [dev-dependencies]
-sp-core = { workspace = true, default-features = true }
 sp-io = { workspace = true, default-features = true }
-sp-runtime = { workspace = true, default-features = true }
+pallet-balances = { workspace = true, features = ["std"] }
+pallet-sudo = { workspace = true, features = ["std"] }
 
 [features]
 default = ["std"]
