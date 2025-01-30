@@ -17,7 +17,10 @@
 use codec::{Decode, Encode, MaxEncodedLen};
 use frame_system::pallet_prelude::BlockNumberFor;
 use scale_info::TypeInfo;
-use sp_runtime::Saturating;
+use sp_runtime::{
+    traits::{CheckedDiv, CheckedMul},
+    Saturating,
+};
 
 // Re-export pallet items so that they can be accessed from the crate namespace.
 pub use pallet::*;
@@ -58,8 +61,6 @@ struct Club<AccountId, Balance, StringLimit: Get<u32>> {
 #[derive(Encode, Decode, MaxEncodedLen, TypeInfo, PartialEq, Eq, Clone, Debug)]
 pub enum MemberStatus<BlockNumber> {
     Paid {
-        /// The block number when the membership started
-        from: BlockNumber,
         /// The block number until the membership is valid
         until: BlockNumber,
     },
@@ -159,17 +160,17 @@ pub mod pallet {
 
     /// Recent club id
     #[pallet::storage]
-    type LastClubId<T: Config> = StorageValue<_, T::ClubId, ValueQuery>;
+    pub(crate) type LastClubId<T: Config> = StorageValue<_, T::ClubId, ValueQuery>;
 
     /// Tracks clubs
     #[pallet::storage]
-    type Clubs<T: Config> = StorageMap<_, Blake2_128Concat, T::ClubId, ClubOf<T>>;
+    pub(crate) type Clubs<T: Config> = StorageMap<_, Blake2_128Concat, T::ClubId, ClubOf<T>>;
 
     /// Tracks clus to members mapping.
     ///
     /// Use `T::AccountId` as a second key to efficiently retrieve member metadata.
     #[pallet::storage]
-    type ClubMembers<T: Config> = StorageDoubleMap<
+    pub(crate) type ClubMembers<T: Config> = StorageDoubleMap<
         _,
         Blake2_128Concat,
         T::ClubId,
@@ -226,8 +227,8 @@ pub mod pallet {
         MemberNotFound,
         /// Member can not pay the fee
         MemberCanNotPayFee,
-        /// Generic arithmetic overflow
-        ArithmeticOverflow,
+        /// Generic arithmetic error, could be an under/overflow, divizion by zero, etc.
+        ArithmeticError,
         /// Caller is not authorised to perform the action, i.e only owner can add members, only owner can transfer the ownership, etc.
         NotAuthorized,
         /// Membership can not be extended beyond `T::MaxMembershipYears` or be zero
@@ -267,7 +268,7 @@ pub mod pallet {
             };
             Clubs::<T>::insert(&club_id, club);
 
-            let next_club_id = club_id.increment().ok_or(Error::<T>::ArithmeticOverflow)?;
+            let next_club_id = club_id.increment().ok_or(Error::<T>::ArithmeticError)?;
 
             LastClubId::<T>::put(next_club_id);
 
@@ -327,7 +328,7 @@ pub mod pallet {
             let total_fees = club
                 .fee
                 .checked_mul(&years_as_balance)
-                .ok_or(Error::<T>::ArithmeticOverflow)?;
+                .ok_or(Error::<T>::ArithmeticError)?;
 
             // Try to charge the fees from the member's account. If the member can not pay the fees, the member is added but is inactive
             let status = match T::Currency::transfer(
@@ -341,7 +342,6 @@ pub mod pallet {
                     let expiration_block_number = current_block_number
                         .saturating_add(T::YEAR_IN_BLOCKS.saturating_mul(years.into()));
                     MemberStatus::Paid {
-                        from: current_block_number,
                         until: expiration_block_number,
                     }
                 }
@@ -445,7 +445,7 @@ pub mod pallet {
             let total_fees = club
                 .fee
                 .checked_mul(&years_as_balance)
-                .ok_or(Error::<T>::ArithmeticOverflow)?;
+                .ok_or(Error::<T>::ArithmeticError)?;
 
             T::Currency::transfer(
                 &member,
@@ -460,23 +460,28 @@ pub mod pallet {
 
             // membership might not be expired yet, in that case we extend from the expiration date in the future
             let status = match club_member.status {
-                MemberStatus::Paid { from, until } => {
+                MemberStatus::Paid { until } => {
+                    // ensure we respect `T::MaxMembershipYears` limit
                     let extend_from = until.max(current_block_number);
+                    // This is safe because `extend_from` is at least `block_number`
+                    let blocks_left = extend_from.saturating_sub(current_block_number);
+                    let years_left = blocks_left
+                        .checked_div(&T::YEAR_IN_BLOCKS)
+                        .ok_or(Error::<T>::ArithmeticError)?;
+                    ensure!(
+                        years_left.saturating_add(years.into())
+                            < T::MaxMembershipYears::get().into(),
+                        Error::<T>::InvalidMembershipPeriod
+                    );
+
                     let extend_to =
                         extend_from.saturating_add(T::YEAR_IN_BLOCKS.saturating_mul(years.into()));
-                    let since = from.min(current_block_number);
-                    MemberStatus::Paid {
-                        from: since,
-                        until: extend_to,
-                    }
+                    MemberStatus::Paid { until: extend_to }
                 }
                 MemberStatus::Inactive => {
                     let extend_to = current_block_number
                         .saturating_add(T::YEAR_IN_BLOCKS.saturating_mul(years.into()));
-                    MemberStatus::Paid {
-                        from: current_block_number,
-                        until: extend_to,
-                    }
+                    MemberStatus::Paid { until: extend_to }
                 }
             };
 

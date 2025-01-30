@@ -21,7 +21,6 @@ panic = 'unwind'
 
 [workspace.dependencies]
 codec = { version = "3.6.12", default-features = false, package = "parity-scale-codec", features = ["derive"] }
-
 serde_json = { version = "1.0.132", default-features = false, features = ["alloc"] }
 scale-info = { version = "2.11.6", default-features = false, features = [
 	"derive",
@@ -101,9 +100,9 @@ sc-transaction-pool = { default-features = true, git = "https://github.com/parit
 sc-transaction-pool-api = { default-features = true, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "stable2412" }
 
 # substrate primitives
-sp-blockchain = { default-features = true, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "stable2412" }
-sp-io = { default-features = true, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "stable2412" }
-sp-timestamp = { default-features = true, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "stable2412" }
+sp-blockchain = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "stable2412" }
+sp-io = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "stable2412" }
+sp-timestamp = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "stable2412" }
 
 # frame and pallets
 pallet-transaction-payment-rpc = { default-features = true, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "stable2412" }

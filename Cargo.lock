@@ -719,15 +719,16 @@ dependencies = [
 
 [[package]]
 name = "bip32"
-version = "0.5.2"
+version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa13fae8b6255872fd86f7faf4b41168661d7d78609f7bfe6771b85c6739a15b"
+checksum = "db40d3dfbeab4e031d78c844642fa0caa0b0db11ce1607ac9d2986dff1405c69"
 dependencies = [
  "bs58",
  "hmac 0.12.1",
  "k256",
  "rand_core",
  "ripemd",
+ "secp256k1 0.27.0",
  "sha2 0.10.8",
  "subtle 2.6.1",
  "zeroize",
@@ -4027,15 +4028,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "itertools"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
-dependencies = [
- "either",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5511,9 +5503,9 @@ dependencies = [
 
 [[package]]
 name = "multimap"
-version = "0.10.0"
+version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "defc4c55412d89136f966bbb339008b474350e5e6e78d2714439c386b3137a03"
+checksum = "e5ce46fe64a9d73be07dcbe690a38ce1b293be448fd8ce1e6c1b8062c9f72c6a"
 
 [[package]]
 name = "multistream-select"
@@ -6945,8 +6937,8 @@ version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0f3e5beed80eb580c68e2c600937ac2c4eedabdfd5ef1e5b7ea4f3fba84497b"
 dependencies = [
- "heck 0.5.0",
- "itertools 0.13.0",
+ "heck 0.4.1",
+ "itertools 0.10.5",
  "log",
  "multimap",
  "once_cell",
@@ -6979,7 +6971,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "157c5a9d7ea5c2ed2d9fb8f495b64759f7816c7eaea54ba3978f0d63000162e3"
 dependencies = [
  "anyhow",
- "itertools 0.13.0",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 2.0.96",
@@ -8966,11 +8958,29 @@ dependencies = [
 
 [[package]]
 name = "secp256k1"
+version = "0.27.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25996b82292a7a57ed3508f052cfff8640d38d32018784acd714758b43da9c8f"
+dependencies = [
+ "secp256k1-sys 0.8.1",
+]
+
+[[package]]
+name = "secp256k1"
 version = "0.28.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d24b59d129cdadea20aea4fb2352fa053712e5d713eee47d700cd4b2bc002f10"
 dependencies = [
- "secp256k1-sys",
+ "secp256k1-sys 0.9.2",
+]
+
+[[package]]
+name = "secp256k1-sys"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70a129b9e9efbfb223753b9163c4ab3b13cff7fd9c7f010fbac25ab4099fa07e"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
@@ -9745,7 +9755,7 @@ dependencies = [
  "rand",
  "scale-info",
  "schnorrkel",
- "secp256k1",
+ "secp256k1 0.28.2",
  "secrecy",
  "serde",
  "sp-crypto-hashing 0.1.0 (git+https://github.com/paritytech/polkadot-sdk.git?branch=stable2412)",
@@ -9866,7 +9876,7 @@ dependencies = [
  "parity-scale-codec",
  "polkavm-derive",
  "rustversion",
- "secp256k1",
+ "secp256k1 0.28.2",
  "sp-core",
  "sp-crypto-hashing 0.1.0 (git+https://github.com/paritytech/polkadot-sdk.git?branch=stable2412)",
  "sp-externalities",
@@ -10629,7 +10639,7 @@ dependencies = [
  "pbkdf2",
  "regex",
  "schnorrkel",
- "secp256k1",
+ "secp256k1 0.28.2",
  "secrecy",
  "sha2 0.10.8",
  "sp-crypto-hashing 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",

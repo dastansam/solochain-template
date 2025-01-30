@@ -1,10 +1,9 @@
 use crate::{self as pallet_membership};
-use frame_support::{derive_impl, parameter_types, traits::AsEnsureOriginWithArg, PalletId};
-use sp_core::{ConstU32, ConstU8};
+use frame_support::{derive_impl, parameter_types, PalletId};
+use sp_core::ConstU8;
 use sp_runtime::BuildStorage;
 
 type Block = frame_system::mocking::MockBlock<Test>;
-type AssetId = u32;
 
 #[frame_support::runtime]
 mod runtime {
@@ -53,11 +52,13 @@ parameter_types! {
     pub const MembershipPalletId: PalletId = PalletId(*b"membersp");
     /// Club creation deposit
     pub const ClubCreationDeposit: u64 = 10;
+    /// String limit for this pallet
+    pub const StringLimit: u32 = 256;
 }
 
 /// 1 year in blocks.
 /// This is only in the mock runtime, in a real runtime this would be calculated from the block time.
-pub const YEARS: u32 = 100;
+pub const YEARS: u64 = 100;
 
 impl pallet_membership::Config for Test {
     type RuntimeEvent = RuntimeEvent;
@@ -71,7 +72,7 @@ impl pallet_membership::Config for Test {
     /// The pallet ID of the membership pallet, used to derive the account ID of the membership pallet
     type PalletId = MembershipPalletId;
     /// The maximum length of a string in this pallet
-    type StringLimit = ConstU32<256>;
+    type StringLimit = StringLimit;
     /// Club creation deposit
     type ClubCreationDeposit = ClubCreationDeposit;
     /// The block number representing a year
@@ -82,17 +83,19 @@ impl pallet_membership::Config for Test {
 pub fn new_test_ext() -> sp_io::TestExternalities {
     // endowed balances for accounts
     let endowed_accounts = vec![
-        (1, 100),
-        (2, 100),
-        (3, 100),
-        (4, 100),
-        (5, 100),
-        (6, 100),
-        (7, 100),
-        (8, 100),
+        (1, 5000),
+        (2, 5000),
+        (3, 5000),
+        (4, 5000),
+        (5, 5000),
+        (6, 5000),
+        (7, 5000),
+        (8, 5000),
+        (9, 5000),
+        (10, 5000),
     ];
 
-    let mut t = frame_system::GenesisConfig::default()
+    let mut t = frame_system::GenesisConfig::<Test>::default()
         .build_storage()
         .unwrap();
 
@@ -106,5 +109,10 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
         .assimilate_storage(&mut t)
         .unwrap();
 
-    t.into()
+    let mut ext = sp_io::TestExternalities::new(t);
+
+    // set the block number to 1
+    ext.execute_with(|| System::set_block_number(1));
+
+    ext
 }
