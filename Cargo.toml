@@ -13,9 +13,12 @@ publish = false
 members = [
     "node",
     "pallets/*",
-    "runtime",
+    "runtime"
 ]
 resolver = "2"
+exclude = [
+    "sudoku"
+]
 [profile.release]
 panic = 'unwind'
 
