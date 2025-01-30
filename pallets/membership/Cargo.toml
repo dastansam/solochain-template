@@ -21,7 +21,7 @@ scale-info = { features = [
 ], workspace = true }
 
 # frame deps
-frame-benchmarking = { optional = true, workspace = true }
+frame-benchmarking = { optional = true, workspace = true, default-features = false }
 frame-support = { workspace = true }
 frame-system = { workspace = true }
 sp-core = { workspace = true, default-features = false }
@@ -36,7 +36,7 @@ pallet-sudo = { workspace = true, features = ["std"] }
 default = ["std"]
 std = [
 	"codec/std",
-	"frame-benchmarking",
+	"frame-benchmarking?/std",
 	"frame-support/std",
 	"frame-system/std",
 	"scale-info/std",
