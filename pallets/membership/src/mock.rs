@@ -82,7 +82,7 @@ impl pallet_membership::Config for Test {
 // Build genesis storage according to the mock runtime.
 pub fn new_test_ext() -> sp_io::TestExternalities {
     // endowed balances for accounts
-    let endowed_accounts = vec![
+    let endowed_accounts = [
         (1, 5000),
         (2, 5000),
         (3, 5000),
@@ -100,7 +100,7 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
         .unwrap();
 
     pallet_balances::GenesisConfig::<Test> {
-        balances: endowed_accounts.iter().cloned().collect(),
+        balances: endowed_accounts.to_vec(),
     }
     .assimilate_storage(&mut t)
     .unwrap();

@@ -1,13 +1,9 @@
-//! Write a pallet for club member management
-//! 1. two roles in the club, root can create a new club, club owner can add someone to
-//! club
-//! 2. need to pay some token to create a new club, the club owner can be transferred,
-//! club owner can set the annual expense for club membership
-//! 3. account needs to pay a token to be a member based on annual expenses, max is
-//! 100 years
+//!  Requirements:
+//!
+//! 1. two roles in the club, root can create a new club, club owner can add someone to club
+//! 2. need to pay some token to create a new club, the club owner can be transferred, club owner can set the annual expense for club membership
+//! 3. account needs to pay a token to be a member based on annual expenses, max is 100 years
 //! 4. membership will be expired, and need renewal
-
-//! Write a pallet for club member management
 //! 1. a club has an owner which can add members
 //! 2. the club can be transferred by the owner to a different owner
 //! 3. the owner sets the annual club membership fee
@@ -248,7 +244,7 @@ pub mod pallet {
         /// * `name` - name of the club
         /// * `fee` - annual fee to be a member of the club
         #[pallet::call_index(0)]
-        #[pallet::weight(T::WeightInfo::do_something())]
+        #[pallet::weight(T::WeightInfo::create_club())]
         pub fn create_club(
             origin: OriginFor<T>,
             owner: T::AccountId,
@@ -263,7 +259,7 @@ pub mod pallet {
 
             let club = Club {
                 name: name.clone(),
-                fee: fee.clone(),
+                fee,
                 owner: owner.clone(),
             };
             Clubs::<T>::insert(&club_id, club);
@@ -303,7 +299,7 @@ pub mod pallet {
         /// * `role` - role of the member
         /// * `fee` - fee to be paid
         #[pallet::call_index(1)]
-        #[pallet::weight(T::WeightInfo::cause_error())]
+        #[pallet::weight(T::WeightInfo::add_member())]
         pub fn add_member(
             origin: OriginFor<T>,
             club_id: T::ClubId,
@@ -373,7 +369,7 @@ pub mod pallet {
         /// * `club_id` - id of the club
         /// * `new_owner` - new owner of the club
         #[pallet::call_index(2)]
-        #[pallet::weight(T::WeightInfo::cause_error())]
+        #[pallet::weight(T::WeightInfo::transfer_club())]
         pub fn transfer_club(
             origin: OriginFor<T>,
             club_id: T::ClubId,
@@ -395,7 +391,7 @@ pub mod pallet {
         /// * `club_id` - id of the club
         /// * `new_fee` - new fee value
         #[pallet::call_index(3)]
-        #[pallet::weight(T::WeightInfo::cause_error())]
+        #[pallet::weight(T::WeightInfo::set_annual_fee())]
         pub fn set_annual_fee(
             origin: OriginFor<T>,
             club_id: T::ClubId,
@@ -418,7 +414,7 @@ pub mod pallet {
         /// * `member` - member to extend the membership
         /// * `years` - number of years to extend the membership
         #[pallet::call_index(4)]
-        #[pallet::weight(T::WeightInfo::cause_error())]
+        #[pallet::weight(T::WeightInfo::extend_membership())]
         pub fn extend_membership(
             origin: OriginFor<T>,
             club_id: T::ClubId,
@@ -513,7 +509,7 @@ pub mod pallet {
         /// * `to` - account to withdraw the fees
         /// * `amount` - amount to withdraw
         #[pallet::call_index(5)]
-        #[pallet::weight(T::WeightInfo::cause_error())]
+        #[pallet::weight(T::WeightInfo::withdraw_fees())]
         pub fn withdraw_fees(
             origin: OriginFor<T>,
             to: T::AccountId,
@@ -559,7 +555,7 @@ pub mod pallet {
                     Self::deposit_event(Event::ClubAnnualFeeSet {
                         club_id: club_id.clone(),
                         old_fee: club.fee,
-                        new_fee: fee.clone(),
+                        new_fee: fee,
                     });
                     club.fee = fee;
                 }

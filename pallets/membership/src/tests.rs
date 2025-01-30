@@ -79,7 +79,7 @@ fn create_club_works() {
         assert_eq!(
             events.pop().unwrap(),
             RuntimeEvent::Membership(Event::<Test>::ClubCreated {
-                club_id: club_id,
+                club_id,
                 owner,
                 name,
                 fee
@@ -174,7 +174,7 @@ fn adding_member_works() {
 
         // assert!(ClubMembers::get(&club_id, &member).unwrap().name == member_name,);
         assert_eq!(
-            ClubMembers::<Test>::get(&club_id, &member).unwrap().status,
+            ClubMembers::<Test>::get(club_id, member).unwrap().status,
             MemberStatus::Paid {
                 until: block_number + YEARS * 5,
             },
@@ -340,17 +340,22 @@ fn fee_charging_and_withdraw_fees_works() {
 /// Comprehensive test that imitates the lifecycle of the pallet
 ///
 /// New club is created
-/// 	New member added
-/// 		- Normal flow where `member` has enough balance to pay for membership fees,
-/// 		member's status is marked as `Paid`, marking `from` which block and `until` which block
-/// 		the membership is valid
-/// 	New member added
-/// 		- `member` does not have enough funds, they should be marked as inactive
-/// 	Member tries to extend his membership
-/// 		- His membership is not expired yet, but this should not fail, simply extend the membership
-/// 		from the current `until` value
-/// 		- His membership is actually expired, then both `from` and `until` should be updated.
-/// 		- His membership is in the future, then membership should be extended from `until`
+///
+/// New member added
+///
+/// Normal flow where `member` has enough balance to pay for membership fees,
+/// member's status is marked as `Paid`, marking `from` which block and `until` which block
+/// the membership is valid
+///
+/// New member added
+///
+/// `member` does not have enough funds, they should be marked as inactive
+///
+/// Member tries to extend his membership
+/// His membership is not expired yet, but this should not fail, simply extend the membership
+/// from the current `until` value
+/// His membership is actually expired, then both `from` and `until` should be updated.
+/// His membership is in the future, then membership should be extended from `until`
 ///
 #[test]
 fn test_full_lifecycle() {
@@ -370,7 +375,7 @@ fn test_full_lifecycle() {
         System::set_block_number(block_number + 1);
 
         // get member metadata
-        let member_metadata = ClubMembers::<Test>::get(&club_id, &member).unwrap();
+        let member_metadata = ClubMembers::<Test>::get(club_id, member).unwrap();
 
         assert_eq!(
             member_metadata.status,
@@ -390,7 +395,7 @@ fn test_full_lifecycle() {
         add_member(new_club_id, new_member, new_member_name, 10);
 
         // get member metadata
-        let new_member_metadata = ClubMembers::<Test>::get(&new_club_id, &new_member).unwrap();
+        let new_member_metadata = ClubMembers::<Test>::get(new_club_id, new_member).unwrap();
 
         // not enough funds to pay for the membership fee
         assert_eq!(new_member_metadata.status, MemberStatus::Inactive);
@@ -405,7 +410,7 @@ fn test_full_lifecycle() {
         )
         .unwrap();
 
-        let new_member_metadata = ClubMembers::<Test>::get(&new_club_id, &new_member).unwrap();
+        let new_member_metadata = ClubMembers::<Test>::get(new_club_id, new_member).unwrap();
 
         // not enough funds to pay for the membership fee
         assert_eq!(
@@ -420,7 +425,7 @@ fn test_full_lifecycle() {
         // trying to extend membership that's not expired
         Membership::extend_membership(RuntimeOrigin::signed(member), club_id, member, 2).unwrap();
 
-        let member_metadata_updated = ClubMembers::<Test>::get(&club_id, &member).unwrap();
+        let member_metadata_updated = ClubMembers::<Test>::get(club_id, member).unwrap();
 
         assert_eq!(
             member_metadata_updated.status,
@@ -436,7 +441,7 @@ fn test_full_lifecycle() {
         // this works
         Membership::extend_membership(RuntimeOrigin::signed(member), club_id, member, 2).unwrap();
 
-        let member_metadata_latest = ClubMembers::<Test>::get(&club_id, &member).unwrap();
+        let member_metadata_latest = ClubMembers::<Test>::get(club_id, member).unwrap();
         assert_eq!(
             member_metadata_latest.status,
             MemberStatus::Paid {
@@ -453,13 +458,12 @@ fn test_full_lifecycle() {
         )
         .unwrap();
 
-        let new_member_metadata_latest =
-            ClubMembers::<Test>::get(&new_club_id, &new_member).unwrap();
+        let new_member_metadata_latest = ClubMembers::<Test>::get(new_club_id, new_member).unwrap();
 
         assert_eq!(
             new_member_metadata_latest.status,
             MemberStatus::Paid {
-                until: current_block_number + YEARS * 1
+                until: current_block_number + YEARS,
             }
         );
         let mut events = events();
@@ -472,7 +476,7 @@ fn test_full_lifecycle() {
             RuntimeEvent::Balances(pallet_balances::Event::Transfer {
                 from: new_member, // should be the `new_member`
                 to: MembershipPalletId::get().into_account_truncating(),
-                amount: 1 * new_club_fee
+                amount: new_club_fee
             })
         );
 

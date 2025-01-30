@@ -1,19 +1,11 @@
 # Substrate Node Template
 
-A fresh [Substrate](https://substrate.io/) node, ready for hacking :rocket:
+A standalone solo chain template with `membership` pallet with below requirements:
 
-A standalone version of this template is available for each release of Polkadot
-in the [Substrate Developer Hub Parachain
-Template](https://github.com/substrate-developer-hub/substrate-node-template/)
-repository. The parachain template is generated directly at each Polkadot
-release branch from the [Solochain Template in
-Substrate](https://github.com/paritytech/polkadot-sdk/tree/master/templates/solochain)
-upstream
-
-It is usually best to use the stand-alone version to start a new project. All
-bugs, suggestions, and feature requests should be made upstream in the
-[Substrate](https://github.com/paritytech/polkadot-sdk/tree/master/substrate)
-repository.
+1. a club has an owner which can add members
+2. the club can be transferred by the owner to a different owner
+3. the owner sets the annual club membership fee
+4. members that haven't payed their yearly membership fee are inactive
 
 ## Getting Started
 
@@ -26,9 +18,7 @@ installation](#alternatives-installations) options.
 Fetch solochain template code:
 
 ```sh
-git clone https://github.com/paritytech/polkadot-sdk-solochain-template.git solochain-template
-
-cd solochain-template
+git clone https://github.com/dastansam/solochain-template.git
 ```
 
 ### Build
@@ -37,6 +27,49 @@ cd solochain-template
 
 ```sh
 cargo build --release
+```
+
+#### Benchmarks
+
+📊 To build with benchmarking enabled, use the following command:
+
+```sh
+cargo build --release --features runtime-benchmarks
+```
+and run pallet benchmarking with:
+
+```sh
+./target/release/solochain-template-node benchmark pallet \
+--chain dev \
+--pallet pallet-membership \
+--extrinsic="*" \
+--steps=50 \
+--repeat=20 \
+--wasm-execution=compiled \
+--output pallets/membership/src/weights.rs \
+--template .maintain/frame-weight-template.hbs
+```
+
+#### Tests
+
+🧪 To run all unit tests:
+
+```sh
+cargo test --all
+```
+
+#### Clippy & fmt
+
+🔍 To check for clippy warnings:
+
+```sh
+cargo clippy --all-targets --all-features -- -D warnings
+```
+
+🔍 To check for formatting issues:
+
+```sh
+cargo fmt --all -- --check
 ```
 
 ### Embedded Docs
