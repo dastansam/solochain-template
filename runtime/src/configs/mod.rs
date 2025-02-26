@@ -35,17 +35,16 @@ use frame_support::{
 };
 use frame_system::limits::{BlockLength, BlockWeights};
 use pallet_transaction_payment::{ConstFeeMultiplier, FungibleAdapter, Multiplier};
-use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_runtime::{traits::One, Perbill};
 use sp_version::RuntimeVersion;
 
-use crate::{DAYS, UNIT};
+use crate::{aura_session, MINUTES, UNIT};
 
 // Local module imports
 use super::{
-    AccountId, Aura, Balance, Balances, Block, BlockNumber, Hash, Nonce, PalletInfo, Runtime,
-    RuntimeCall, RuntimeEvent, RuntimeFreezeReason, RuntimeHoldReason, RuntimeOrigin, RuntimeTask,
-    System, EXISTENTIAL_DEPOSIT, SLOT_DURATION, VERSION,
+    AccountId, Aura, AuraId, Balance, Balances, Block, BlockNumber, Hash, Nonce, PalletInfo,
+    Runtime, RuntimeCall, RuntimeEvent, RuntimeFreezeReason, RuntimeHoldReason, RuntimeOrigin,
+    RuntimeTask, System, EXISTENTIAL_DEPOSIT, SLOT_DURATION, VERSION,
 };
 
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
@@ -170,17 +169,7 @@ parameter_types! {
     /// String limit for this pallet
     pub const StringLimit: u32 = 128;
 }
-/// Configure the pallet-template in pallets/template.
-impl pallet_membership::Config for Runtime {
-    type RuntimeEvent = RuntimeEvent;
-    type ClubCreationDeposit = ClubCreationDeposit;
-    type ClubId = u32;
-    type Currency = Balances;
-    type MaxMembershipYears = MaxMembershipYears;
-    type PalletId = MembershipPalletId;
-    type StringLimit = StringLimit;
-    type WeightInfo = ();
 
-    /// For the sake of simplicity, assume 365 days in a year
-    const YEAR_IN_BLOCKS: frame_system::pallet_prelude::BlockNumberFor<Self> = DAYS * 365;
+impl aura_session::Config for Runtime {
+    type SessionLength = ConstU32<MINUTES>;
 }

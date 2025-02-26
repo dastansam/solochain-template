@@ -4,6 +4,7 @@
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 pub mod apis;
+pub mod aura_session;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarks;
 pub mod configs;
@@ -18,6 +19,7 @@ use sp_runtime::{
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
+pub use spin_primitives::sr25519::AuthorityId as AuraId;
 
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
@@ -188,6 +190,8 @@ pub type Executive = frame_executive::Executive<
 // Create the runtime by composing the FRAME pallets that were previously configured.
 #[frame_support::runtime]
 mod runtime {
+    use crate::aura_session;
+
     #[runtime::runtime]
     #[runtime::derive(
         RuntimeCall,
@@ -223,7 +227,6 @@ mod runtime {
     #[runtime::pallet_index(6)]
     pub type Sudo = pallet_sudo;
 
-    // Include the custom logic from the pallet-template in the runtime.
     #[runtime::pallet_index(7)]
-    pub type Membership = pallet_membership;
+    pub type AuraSession = aura_session;
 }

@@ -40,7 +40,7 @@ pallet-transaction-payment = { workspace = true }
 # primitives
 sp-api = { workspace = true }
 sp-block-builder = { workspace = true }
-sp-consensus-aura = { features = [
+spin-primitives = { features = [
 	"serde",
 ], workspace = true }
 sp-consensus-grandpa = { features = [
@@ -71,8 +71,8 @@ pallet-transaction-payment-rpc-runtime-api = { workspace = true }
 frame-benchmarking = { optional = true, workspace = true }
 frame-system-benchmarking = { optional = true, workspace = true }
 
-# The membership pallet
-pallet-membership = { workspace = true }
+[dev-dependencies]
+sp-io = { workspace = true }
 
 [build-dependencies]
 substrate-wasm-builder = { optional = true, workspace = true, default-features = true }
@@ -93,7 +93,6 @@ std = [
 	"pallet-balances/std",
 	"pallet-grandpa/std",
 	"pallet-sudo/std",
-	"pallet-membership/std",
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
@@ -101,7 +100,7 @@ std = [
 	"serde_json/std",
 	"sp-api/std",
 	"sp-block-builder/std",
-	"sp-consensus-aura/std",
+	"spin-primitives/std",
 	"sp-consensus-grandpa/std",
 	"sp-core/std",
 	"sp-genesis-builder/std",
@@ -124,7 +123,6 @@ runtime-benchmarks = [
 	"pallet-balances/runtime-benchmarks",
 	"pallet-grandpa/runtime-benchmarks",
 	"pallet-sudo/runtime-benchmarks",
-	"pallet-membership/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 ]
@@ -138,7 +136,6 @@ try-runtime = [
 	"pallet-balances/try-runtime",
 	"pallet-grandpa/try-runtime",
 	"pallet-sudo/try-runtime",
-	"pallet-membership/try-runtime",
 	"pallet-timestamp/try-runtime",
 	"pallet-transaction-payment/try-runtime",
 	"sp-runtime/try-runtime",

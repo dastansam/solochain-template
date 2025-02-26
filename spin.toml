@@ -1,0 +1,24 @@
+[relaychain]
+default_command = "~/.cargo/target/release/solochain-template-node"
+chain = "spec.json"
+args = ["--state-pruning archive --blocks-pruning archive"]
+
+[[relaychain.nodes]]
+name = "alice"
+args = ["-ldebug", "--force-authoring"]
+
+[[relaychain.nodes]]
+name = "bob"
+args = ["-ldebug", "--force-authoring"]
+
+[[relaychain.nodes]]
+name = "charlie"
+args = ["--force-authoring"]
+
+[[relaychain.nodes]]
+name = "dave"
+validator = false
+
+[[relaychain.nodes]]
+name = "eve"
+validator = false
